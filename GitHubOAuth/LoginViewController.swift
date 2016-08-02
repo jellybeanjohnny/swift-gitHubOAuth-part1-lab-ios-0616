@@ -8,6 +8,7 @@
 
 import UIKit
 import Locksmith
+import SafariServices
 
 class LoginViewController: UIViewController {
     
@@ -18,10 +19,14 @@ class LoginViewController: UIViewController {
     let numberOfOctocatImages = 10
     var octocatImages: [UIImage] = []
     
+    var safariVC: SFSafariViewController?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setUpImageViewAnimation()
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(safariLogin), name: Notification.closeSafariVC, object: nil)
 
     }
     
@@ -35,7 +40,16 @@ class LoginViewController: UIViewController {
     
     
     @IBAction func loginButtonTapped(sender: UIButton) {
+        guard let url = NSURL(string: GitHubAPIClient.URLRouter.oauth) else { fatalError("Invalid URL") }
+        let safariVC = SFSafariViewController(URL: url)
+        presentViewController(safariVC, animated: true, completion: nil)
+    }
     
+    func safariLogin(notification: NSNotification) {
+        if let url = notification.object as? NSURL {
+            print(url)
+            presentedViewController?.dismissViewControllerAnimated(true, completion: nil)
+        }
     }
     
 }
